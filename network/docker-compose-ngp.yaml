@@ -1,4 +1,4 @@
-version: '2'
+version: '2.0'
 
 volumes:
     orderer:
@@ -6,13 +6,13 @@ volumes:
     peer-gap:
     peer-alnwick:
 
-network:
+networks:
     ngp:
 
 services:
     orderer:
         container_name: orderer
-        image: hyperledger/fabric-orderer:latest
+        image: hyperledger/fabric-orderer:2.1.1
         environment:
             - FABRIC_LOGGING_SPEC=INFO
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
@@ -85,7 +85,7 @@ services:
             - ngp
 
     peer-alnwick:
-        container_name: peer=alnwick
+        container_name: peer-alnwick
         image: peer-ext:2.0.0
         environment:
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -103,7 +103,7 @@ services:
         command: peer node start
         volumes:
             - /var/run:/host/var/run/
-            - ./certs/peeralnwick/peer/msp:/etc/hyperledger/fabric/msp
+            - ./certs/peeraln/peer/msp:/etc/hyperledger/fabric/msp
             - peer-alnwick:/var/hyperledger/production
         ports:
             - "9051:9051"
@@ -112,7 +112,7 @@ services:
 
     cli:
         container_name: cli
-        image: hyperledger/fabric-tools:latest
+        image: hyperledger/fabric-tools:2.1.1
         tty: true
         stdin_open: true
         environment:
