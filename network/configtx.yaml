@@ -16,26 +16,68 @@ Organizations:
                           Rule: "OR('ordererMSP.admin')"
           OrdererEndpoints:
                   - orderer:7050
-        - &Org
-          Name: orgMSP
-          ID: orgMSP
-          MSPDir: ./certs/peerorg/msp
+        - &Ngp
+          Name: ngpMSP
+          ID: ngpMSP
+          MSPDir: ./certs/peerngp/msp
           Policies:
                   Readers:
                           Type: Signature
-                          Rule: "OR('orgMSP.member')"
+                          Rule: "OR('ngpMSP.member')"
                   Writers:
                           Type: Signature
-                          Rule: "OR('orgMSP.admin','orgMSP.client')"
+                          Rule: "OR('ngpMSP.admin','ngpMSP.client')"
                   Admins:
                           Type: Signature
-                          Rule: "OR('orgMSP.admin')"
+                          Rule: "OR('ngpMSP.admin')"
                   Endorsement:
                           Type: Signature
-                          Rule: "OR('orgMSP.peer')"
+                          Rule: "OR('ngpMSP.peer')"
           AnchorPeers:
-                  - Host: peer-org
+                  - Host: peer-ngp
                     Port: 7051
+
+        - &AlnWick
+          Name: alnMSP
+          ID: alnMSP
+          MSPDir: ./certs/peeraln/msp
+          Policies:
+                  Readers:
+                          Type: Signature
+                          Rule: "OR('alnMSP.member')"
+                  Writers:
+                          Type: Signature
+                          Rule: "OR('alnMSP.admin','alnMSP.client')"
+                  Admins:
+                          Type: Signature
+                          Rule: "OR('alnMSP.admin')"
+                  Endorsement:
+                          Type: Signature
+                          Rule: "OR('alnMSP.peer')"
+          AnchorPeers:
+                  - Host: peer-aln
+                    Port: 7052
+                    
+        - &GAP
+          Name: gapMSP
+          ID: gapMSP
+          MSPDir: ./certs/peergap/msp
+          Policies:
+                  Readers:
+                          Type: Signature
+                          Rule: "OR('gapMSP.member')"
+                  Writers:
+                          Type: Signature
+                          Rule: "OR('gapMSP.admin','gapMSP.client')"
+                  Admins:
+                          Type: Signature
+                          Rule: "OR('gapMSP.admin')"
+                  Endorsement:
+                          Type: Signature
+                          Rule: "OR('gapMSP.peer')"
+          AnchorPeers:
+                  - Host: peer-gap
+                    Port: 7053            
 
 Capabilities:
         Channel: &ChannelCapabilities
@@ -116,15 +158,26 @@ Profiles:
                         Capabilities:
                                 <<: *OrdererCapabilities
                 Consortiums:
-                        SingleORG:
+                        NgpConsortium:
                                 Organizations:
-                                        - *Org
-        OrgChannel:
-                Consortium: SingleORG
+                                        - *Ngp
+                                        - *AlnWick
+                                        - *GAP
+        AlnWickChannel:
+                Consortium: NgpConsortium
                 <<: *ChannelDefaults
                 Application:
                         <<: *ApplicationDefaults
                         Organizations:
-                                - *Org
+                                - *AlnWick
                         Capabilities:
                                 <<: *ApplicationCapabilities
+        GAPChannel:
+                Consortium: NgpConsortium
+                <<: *ChannelDefaults
+                Application:
+                        <<: *ApplicationDefaults
+                        Organizations:
+                                - *GAP
+                        Capabilities:
+                                <<: *ApplicationCapabilities                        

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export PATH=/home/hl-dinesh/workspace/fabric-samples/bin:$PATH
 export FABRIC_CFG_PATH=${PWD}
 export CHANNEL_NAME="testchannel"
 
@@ -18,9 +18,12 @@ function genesis() {
 function channel() {
         echo "#########  Generating Channel Creation Tx ##############"
 	set -x
- 	configtxgen -profile OrgChannel -outputCreateChannelTx ./channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
+ 	configtxgen -profile $CHANNEL_NAME -outputCreateChannelTx ./channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
 	set +x
 }	
 
 genesis
+export CHANNEL_NAME="AlnWickChannel"
+channel
+export CHANNEL_NAME="GAPChannel"
 channel

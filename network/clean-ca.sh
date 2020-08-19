@@ -8,12 +8,15 @@ if [ -d channel-artifacts ]; then
 	rm -r channel-artifacts
 fi
 
-pushd ./ca/tls-ca/
+pushd ./ca/ngp-ca/
  ./clean-up.sh
  popd
 pushd ./ca/ord-ca/
  ./clean-up.sh
 popd
-pushd ./ca/org-ca/
+pushd ./ca/aln-ca/
+ ./clean-up.sh
+popd
+pushd ./ca/gap-ca/
  ./clean-up.sh
 popd
