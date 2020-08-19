@@ -1,0 +1,134 @@
+version: '2'
+
+volumes:
+    orderer:
+    peer-ngp:
+    peer-gap:
+    peer-alnwick:
+
+network:
+    ngp:
+
+services:
+    orderer:
+        container_name: orderer
+        image: hyperledger/fabric-orderer:latest
+        environment:
+            - FABRIC_LOGGING_SPEC=INFO
+            - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+            - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+            - ORDERER_GENERAL_GENESISMETHOD=file
+            - ORDERER_GENERAL_LOCALMSPID=ordererMSP
+            - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+            - ORDERER_GENERAL_TLS_ENABLED=false
+        working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+        command: orderer
+        volumes:
+            - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+            - ./certs/ordererorg/orderer/msp:/var/hyperledger/orderer/msp
+            - orderer:/var/hyperledger/production/orderer
+        ports:
+            - "7050:7050"
+        networks:
+            - ngp
+
+    peer-ngp:
+        container_name: peer-ngp
+        image: peer-ext:2.0.0
+        environment: 
+            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=network_ngp
+            - FABRIC_LOGGING_SPEC=INFO
+            - CORE_PEER_ID=peer-ngp
+            - CORE_PEER_ADDRESS=peer-ngp:7051
+            - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+            - CORE_PEER_LOCALMSPID=ngpMSP
+            - CORE_PEER_TLS_ENABLED=false
+            - CORE_PEER_GOSSIP_USELEADERELECTION=false
+            - CORE_PEER_GOSSIP_ORGLEADER=true
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer-ngp:7051
+        working_dir: /etc/hyperledger/fabric
+        command: peer node start
+        volumes:
+            - /var/run/:/host/var/run/
+            - ./certs/peerngp/peer/msp:/etc/hyperledger/fabric/msp
+            - peer-ngp:/var/hyperledger/production
+        ports:
+            - "7051:7051"
+        networks:
+            - ngp
+
+    peer-gap:
+        container_name: peer-gap
+        image: peer-ext:2.0.0
+        environment:
+            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=network_ngp
+            - FABRIC_LOGGING_SPEC=INFO
+            - CORE_PEER_ID=peer-gap
+            - CORE_PEER_ADDRESS=peer-gap:8051
+            - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+            - CORE_PEER_LOCALMSPID=gapMSP
+            - CORE_PEER_TLS_ENABLED=false
+            - CORE_PEER_GOSSIP_USELEADERELECTION=false
+            - CORE_PEER_GOSSIP_ORGLEADER=true
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer-gap:8051
+        working_dir: /etc/hyperledger/fabric
+        command: peer node start
+        volumes:
+            - /var/run:/host/var/run/
+            - ./certs/peergap/peer/msp:/etc/hyperledger/fabric/msp
+            - peer-gap:/var/hyperledger/production
+        ports:
+            - "8051:8051"
+        networks:
+            - ngp
+
+    peer-alnwick:
+        container_name: peer=alnwick
+        image: peer-ext:2.0.0
+        environment:
+            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=network_ngp
+            - FABRIC_LOGGING_SPEC=INFO
+            - CORE_PEER_ID=peer-alnwick
+            - CORE_PEER_ADDRESS=peer-alnwick:9051
+            - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+            - CORE_PEER_LOCALMSPID=alnwickMSP
+            - CORE_PEER_TLS_ENABLED=false
+            - CORE_PEER_GOSSIP_USELEADERELECTION=false
+            - CORE_PEER_GOSSIP_ORGLEADER=true
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer-alnwick:9051
+        working_dir: /etc/hyperledger/fabric
+        command: peer node start
+        volumes:
+            - /var/run:/host/var/run/
+            - ./certs/peeralnwick/peer/msp:/etc/hyperledger/fabric/msp
+            - peer-alnwick:/var/hyperledger/production
+        ports:
+            - "9051:9051"
+        networks:
+            - ngp
+
+    cli:
+        container_name: cli
+        image: hyperledger/fabric-tools:latest
+        tty: true
+        stdin_open: true
+        environment:
+            - GOPATH=/opt/gopath
+            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+            - FABRIC_LOGGING_SPEC=INFO
+            - CORE_PEER_ID=cli
+            - CORE_PEER_ADDRESS=peer-ngp:7051
+            - CORE_PEER_LOCALMSPID=ngpMSP
+            - CORE_PEER_TLS_ENABLED=false
+            - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/certs/peerngp/admin/msp
+        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+        command: /bin/bash
+        volumes:
+            - /var/run/:/host/var/run/
+            - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+            - ./certs:/opt/gopath/src/github.com/hyperledger/fabric/peer/certs
+        networks:
+            - ngp
