@@ -17,8 +17,8 @@ Organizations:
           OrdererEndpoints:
                   - orderer:7050
         - &Ngp
-          Name: ngpMSP
-          ID: ngpMSP
+          Name: "ngpMSP"
+          ID: "ngpMSP"
           MSPDir: ./certs/peerngp/msp
           Policies:
                   Readers:
@@ -32,7 +32,7 @@ Organizations:
                           Rule: "OR('ngpMSP.admin')"
                   Endorsement:
                           Type: Signature
-                          Rule: "OR('ngpMSP.peer')"
+                          Rule: "OR('ngpMSP.peer','ngpMSP.admin')"
           AnchorPeers:
                   - Host: peer-ngp
                     Port: 7051
@@ -53,7 +53,7 @@ Organizations:
                           Rule: "OR('alnwickMSP.admin')"
                   Endorsement:
                           Type: Signature
-                          Rule: "OR('alnwickMSP.peer')"
+                          Rule: "OR('alnwickMSP.peer','alnwickMSP.admin')"
           AnchorPeers:
                   - Host: peer-alnwick
                     Port: 9051
@@ -74,7 +74,7 @@ Organizations:
                           Rule: "OR('gapMSP.admin')"
                   Endorsement:
                           Type: Signature
-                          Rule: "OR('gapMSP.peer')"
+                          Rule: "OR('gapMSP.peer','gapMSP.admin')"
           AnchorPeers:
                   - Host: peer-gap
                     Port: 8051            
@@ -163,7 +163,7 @@ Profiles:
                                         - *Ngp
                                         - *AlnWick
                                         - *GAP
-        AlnWickChannel:
+        alnwickchannel:
                 Consortium: NgpConsortium
                 <<: *ChannelDefaults
                 Application:
@@ -173,7 +173,7 @@ Profiles:
                                 - *Ngp
                         Capabilities:
                                 <<: *ApplicationCapabilities
-        GAPChannel:
+        gapchannel:
                 Consortium: NgpConsortium
                 <<: *ChannelDefaults
                 Application:

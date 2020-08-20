@@ -30,13 +30,13 @@ function anchor() {
 	fi
 }
 genesis
-export CHANNEL_NAME="AlnWickChannel"
+export CHANNEL_NAME="alnwickchannel"
 channel
-export CHANNEL_NAME="GAPChannel"
+export CHANNEL_NAME="gapchannel"
 channel
-export CHANNEL_NAME="AlnWickChannel"
+export CHANNEL_NAME="alnwickchannel"
 anchor "alnwickMSP"
 anchor "ngpMSP"
-export CHANNEL_NAME="GAPChannel"
+export CHANNEL_NAME="gapchannel"
 anchor "gapMSP"
 anchor "ngpMSP"
